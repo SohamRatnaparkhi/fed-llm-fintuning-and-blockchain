@@ -8,10 +8,13 @@ from peft import AutoPeftModelForCausalLM
 from transformers import AutoTokenizer
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--peft-path", type=str, default=None)
-parser.add_argument("--question", type=str, default="How are you")
+parser.add_argument("--peft-path", type=str,
+                    default="/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/results/2024-09-28_14-11-57/checkpoint-10")
+parser.add_argument("--question", type=str,
+                    default="What is the capital of France?")
 parser.add_argument("--template", type=str, default="vicuna_v1.1")
-args = parser.parse_args()
+
+args, unknown = parser.parse_known_args()
 
 # Load model and tokenizer
 model = AutoPeftModelForCausalLM.from_pretrained(
@@ -30,17 +33,21 @@ conv.append_message(conv.roles[1], None)
 prompt = conv.get_prompt()
 input_ids = tokenizer([prompt]).input_ids
 
-output_ids = model.generate(
-    input_ids=torch.as_tensor(input_ids).cuda(),
-    do_sample=True,
-    temperature=temperature,
-    max_new_tokens=1024,
-)
+try:
+    output_ids = model.generate(
+        input_ids=torch.as_tensor(input_ids).cuda(),
+        do_sample=True,
+        temperature=temperature,
+        max_length=1024,
+    )
+except RuntimeError as e:
+    print(f"Error during generation: {e}")
+    # Add any additional debugging information here
 
 output_ids = (
     output_ids[0]
     if model.config.is_encoder_decoder
-    else output_ids[0][len(input_ids[0]) :]
+    else output_ids[0][len(input_ids[0]):]
 )
 
 # Be consistent with the template's stop_token_ids
