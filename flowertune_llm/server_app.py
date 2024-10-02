@@ -3,18 +3,21 @@
 import os
 from datetime import datetime
 
+import matplotlib.pyplot as plt
 from flwr.common import Context, ndarrays_to_parameters
 from flwr.common.config import unflatten_dict
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.server.strategy import FedAvg
 from omegaconf import DictConfig
 
-from flowertune_llm.models import get_model, get_parameters, set_parameters
 from flowertune_llm.dataset import replace_keys
-
+from flowertune_llm.models import get_model, get_parameters, set_parameters
 
 # Get function that will be executed by the strategy's evaluate() method
 # Here we use it to save global model checkpoints
+all_losses = []
+
+
 def get_evaluate_fn(model_cfg, save_every_round, total_round, save_path):
     """Return an evaluation function for saving global model."""
 
@@ -23,11 +26,33 @@ def get_evaluate_fn(model_cfg, save_every_round, total_round, save_path):
         if server_round != 0 and (
             server_round == total_round or server_round % save_every_round == 0
         ):
-            # Init model
+           # Init model
             model = get_model(model_cfg)
             set_parameters(model, parameters)
 
             model.save_pretrained(f"{save_path}/peft_{server_round}")
+
+        if server_round == total_round:
+            # Save losses
+            with open(f"{save_path}/all_losses.txt", "w") as f:
+                for loss in all_losses:
+                    f.write(f"{loss}\n")
+
+            # Save losses graph
+            y = all_losses
+            x = list(range(1, len(y) + 1))
+
+            plt.plot(x, y)
+            plt.xlabel("Round")
+            plt.ylabel("Loss")
+
+            name = model_cfg.name
+            quantization = model_cfg.quantization
+            clients = 3
+
+            save_name = "_".join(
+                f"{name}_{quantization}_losses_{clients}_clients".split('/'))
+            plt.savefig(f"{save_path}/{save_name}.png")
 
         return 0.0, {}
 
@@ -54,6 +79,8 @@ def fit_weighted_average(metrics):
     examples = [num_examples for num_examples, _ in metrics]
 
     # Aggregate and return custom metric (weighted average)
+    loss = sum(losses) / sum(examples)
+    all_losses.append(loss)
     return {"train_loss": sum(losses) / sum(examples)}
 
 

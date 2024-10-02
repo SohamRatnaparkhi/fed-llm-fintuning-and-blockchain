@@ -9,9 +9,9 @@ from transformers import AutoTokenizer
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--peft-path", type=str,
-                    default="/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/results/2024-09-28_14-11-57/checkpoint-10")
+                    default="./results/2024-09-28_13-02-38/peft_100")
 parser.add_argument("--question", type=str,
-                    default="What is the capital of France?")
+                    default="What is the capital of India?")
 parser.add_argument("--template", type=str, default="vicuna_v1.1")
 
 args, unknown = parser.parse_known_args()
@@ -24,7 +24,7 @@ base_model = model.peft_config["default"].base_model_name_or_path
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
 # Generate answers
-temperature = 0.7
+temperature = 0.5
 choices = []
 conv = get_conv_template(args.template)
 
@@ -38,7 +38,7 @@ try:
         input_ids=torch.as_tensor(input_ids).cuda(),
         do_sample=True,
         temperature=temperature,
-        max_length=1024,
+        max_length=1000,
     )
 except RuntimeError as e:
     print(f"Error during generation: {e}")

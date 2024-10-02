@@ -10,21 +10,14 @@ from flwr.common import Context
 from flwr.common.config import unflatten_dict
 from flwr.common.typing import NDArrays, Scalar
 from omegaconf import DictConfig
-
 from transformers import TrainingArguments
 from trl import SFTTrainer
 
 from flowertune_llm.dataset import (
-    get_tokenizer_and_data_collator_and_propt_formatting,
-    load_data,
-    replace_keys,
-)
-from flowertune_llm.models import (
-    cosine_annealing,
-    get_model,
-    set_parameters,
-    get_parameters,
-)
+    get_tokenizer_and_data_collator_and_propt_formatting, load_data,
+    replace_keys)
+from flowertune_llm.models import (cosine_annealing, get_model, get_parameters,
+                                   set_parameters)
 
 # Avoid warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "true"
@@ -47,9 +40,11 @@ class FlowerClient(NumPyClient):
         data_collator,
         num_rounds,
     ):  # pylint: disable=too-many-arguments
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda:0" if torch.cuda.is_available() else "cpu")
         self.train_cfg = train_cfg
-        self.training_argumnets = TrainingArguments(**train_cfg.training_arguments)
+        self.training_argumnets = TrainingArguments(
+            **train_cfg.training_arguments)
         self.tokenizer = tokenizer
         self.formatting_prompts_func = formatting_prompts_func
         self.data_collator = data_collator
