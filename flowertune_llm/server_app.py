@@ -16,6 +16,10 @@ from flowertune_llm.models import get_model, get_parameters, set_parameters
 # Get function that will be executed by the strategy's evaluate() method
 # Here we use it to save global model checkpoints
 all_losses = []
+LOSS_FILE_PATH = ""
+
+import os
+os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
 
 def get_evaluate_fn(model_cfg, save_every_round, total_round, save_path):
@@ -27,7 +31,7 @@ def get_evaluate_fn(model_cfg, save_every_round, total_round, save_path):
             server_round == total_round or server_round % save_every_round == 0
         ):
            # Init model
-            model = get_model(model_cfg)
+            model, _ = get_model(model_cfg)
             set_parameters(model, parameters)
 
             model.save_pretrained(f"{save_path}/peft_{server_round}")
@@ -41,20 +45,34 @@ def get_evaluate_fn(model_cfg, save_every_round, total_round, save_path):
             # Save losses graph
             y = all_losses
             x = list(range(1, len(y) + 1))
-
-            plt.plot(x, y)
+            print(x)
+            print(y)
+            losses = [float(loss) for loss in y]
+            plt.figure(figsize=(12, 6))
+            plt.plot(x, losses)
             plt.xlabel("Round")
             plt.ylabel("Loss")
+            plt.title("Losses over Rounds")
+            plt.ylim(min(losses) - 0.05, max(losses) + 0.05)
+            plt.grid(True, linestyle='--', alpha=0.7)
+            plt.tight_layout()
+            plt.show()
+            # plt.plot(x, y)
+            # plt.xlabel("Round")
+            # plt.ylabel("Loss")
 
-            name = model_cfg.name
-            quantization = model_cfg.quantization
+            # name = model_cfg.name
+            # quantization = model_cfg.quantization
             clients = 3
-
+            name = model_cfg.name
+            quant = model_cfg.quantization
+            if name != "":
+                name = name.split('/')[-1]
             save_name = "_".join(
-                f"{name}_{quantization}_losses_{clients}_clients".split('/'))
+                f"{name}_{quant}_losses_{clients}_clients".split('/'))
             plt.savefig(f"{save_path}/{save_name}.png")
 
-        return 0.0, {}
+        return 0.001, {}
 
     return evaluate
 
@@ -81,6 +99,12 @@ def fit_weighted_average(metrics):
     # Aggregate and return custom metric (weighted average)
     loss = sum(losses) / sum(examples)
     all_losses.append(loss)
+    print("All losses till now")
+    print(all_losses)
+    print(LOSS_FILE_PATH)
+    with open(LOSS_FILE_PATH, "w") as f:
+                for loss in all_losses:
+                    f.write(f"{loss}\n")
     return {"train_loss": sum(losses) / sum(examples)}
 
 
@@ -88,16 +112,22 @@ def server_fn(context: Context):
     """Construct components that set the ServerApp behaviour."""
     # Create output directory given current timestamp
     current_time = datetime.now()
-    folder_name = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+    cfg = DictConfig(replace_keys(unflatten_dict(context.run_config)))
+    model_name = cfg.model.name or ""
+    quant = cfg.model.quantization
+    if model_name != "":
+        model_name = model_name.split("/")[-1]
+    folder_name = f"{model_name}_{quant}" + current_time.strftime("%Y-%m-%d_%H-%M-%S")
     save_path = os.path.join(os.getcwd(), f"results/{folder_name}")
     os.makedirs(save_path, exist_ok=True)
-
+    global LOSS_FILE_PATH
+    LOSS_FILE_PATH = save_path + '/all_losses.txt'
+    print(LOSS_FILE_PATH)
     # Read from config
     num_rounds = context.run_config["num-server-rounds"]
-    cfg = DictConfig(replace_keys(unflatten_dict(context.run_config)))
 
     # Get initial model weights
-    init_model = get_model(cfg.model)
+    init_model, tokenizer = get_model(cfg.model)
     init_model_parameters = get_parameters(init_model)
     init_model_parameters = ndarrays_to_parameters(init_model_parameters)
 

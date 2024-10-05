@@ -12,7 +12,7 @@ dependencies = [
     "flwr-datasets>=0.3.0",
     "trl==0.8.1",
     "bitsandbytes==0.44.0",
-    "scipy==1.13.0",
+    "scipy",
     "peft==0.6.2",
     "fschat[model_worker,webui]==0.2.35",
     "transformers==4.45.1",
@@ -32,12 +32,12 @@ serverapp = "flowertune_llm.server_app:app"
 clientapp = "flowertune_llm.client_app:app"
 
 [tool.flwr.app.config]
-dataset.name = "pankajrajdeo/DrugBank"
-model.name = "openai-community/gpt2"
+dataset.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/datasets/truehealth___medicationqa"
+model.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/unsloth/models/llama3_1_8b_4bit"
 model.quantization = 4
 model.gradient-checkpointing = true
-model.lora.peft-lora-r = 32
-model.lora.peft-lora-alpha = 64
+model.lora.peft-lora-r = 16
+model.lora.peft-lora-alpha = 32
 train.save-every-round = 5
 train.learning-rate-max = 5e-5
 train.learning-rate-min = 1e-6
@@ -53,7 +53,7 @@ train.training-arguments.save-steps = 1000
 train.training-arguments.save-total-limit = 10
 train.training-arguments.gradient-checkpointing = true
 train.training-arguments.lr-scheduler-type = "constant"
-strategy.fraction-fit = 0.1
+strategy.fraction-fit = 0.2
 strategy.fraction-evaluate = 0.0
 num-server-rounds = 50
 
@@ -61,6 +61,6 @@ num-server-rounds = 50
 default = "local-simulation"
 
 [tool.flwr.federations.local-simulation]
-options.num-supernodes = 30
+options.num-supernodes = 20
 options.backend.client-resources.num-cpus = 8
-options.backend.client-resources.num-gpus = 0.75
+options.backend.client-resources.num-gpus = 1

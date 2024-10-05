@@ -2,6 +2,7 @@ from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import IidPartitioner
 from transformers import AutoTokenizer
 from trl import DataCollatorForCompletionOnlyLM
+from datasets import load_dataset
 
 FDS = None  # Cache FederatedDataset
 
@@ -16,11 +17,12 @@ def formatting_prompts_func(example):
     return output_texts
 
 
-def get_tokenizer_and_data_collator_and_propt_formatting(model_name: str):
+def get_tokenizer_and_data_collator_and_propt_formatting(tokenizer):
     # From: https://huggingface.co/docs/trl/en/sft_trainer
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_name, use_fast=True, padding_side="right"
-    )
+    # model_path = '/home/sohamr/projects/def-ssamet-ab/sohamr/models/models--openai-community--gpt2'
+    # tokenizer = AutoTokenizer.from_pretrained(
+    #     model_name, use_fast=True, padding_side="right"
+    # )
     tokenizer.pad_token = tokenizer.eos_token
     response_template_with_context = "\n### Response:"  # alpaca response tag
     response_template_ids = tokenizer.encode(
@@ -38,16 +40,25 @@ def load_data(partition_id: int, num_partitions: int, dataset_name: str):
     # Only initialize `FederatedDataset` once
     global FDS
     if FDS is None:
+        # local_dataset_path = "/home/sohamr/projects/def-ssamet-ab/sohamr/datasets/pankajrajdeo___drug_bank"
+        
+        # Load the local dataset
+        local_dataset = load_dataset(dataset_name)
+        
+        # Create the partitioner
         partitioner = IidPartitioner(num_partitions=num_partitions)
+        
+        # Create FederatedDataset with the local dataset
         FDS = FederatedDataset(
             dataset=dataset_name,
             partitioners={"train": partitioner},
         )
+        # partitioner.dataset = local_dataset
     client_trainset = FDS.load_partition(partition_id, "train")
-    # client_trainset = client_trainset.rename_column("Answer", "response")
-    # client_trainset = client_trainset.rename_column(
-    #     "Question", "instruction")
-    client_trainset = make_dataset_drug_bank(client_trainset)
+    client_trainset = client_trainset.rename_column("Answer", "response")
+    client_trainset = client_trainset.rename_column(
+        "Question", "instruction")
+    # client_trainset = make_dataset_drug_bank(client_trainset)
     return client_trainset
 
 
