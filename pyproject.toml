@@ -32,9 +32,9 @@ serverapp = "flowertune_llm.server_app:app"
 clientapp = "flowertune_llm.client_app:app"
 
 [tool.flwr.app.config]
-dataset.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/datasets/truehealth___medicationqa"
-model.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/unsloth/models/llama3_1_8b_4bit"
-model.quantization = 4
+dataset.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/datasets/vicgalle___alpaca-gpt4"
+model.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/unsloth/models/llama_3_1_70b"
+model.quantization = 8
 model.gradient-checkpointing = true
 model.lora.peft-lora-r = 16
 model.lora.peft-lora-alpha = 32

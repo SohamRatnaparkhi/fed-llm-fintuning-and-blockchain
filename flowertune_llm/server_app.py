@@ -113,12 +113,16 @@ def server_fn(context: Context):
     # Create output directory given current timestamp
     current_time = datetime.now()
     cfg = DictConfig(replace_keys(unflatten_dict(context.run_config)))
+    dataset = cfg.dataset.name
+    if dataset != "":
+        dataset = dataset.split("/")[-1]
     model_name = cfg.model.name or ""
     quant = cfg.model.quantization
     if model_name != "":
         model_name = model_name.split("/")[-1]
-    folder_name = f"{model_name}_{quant}" + current_time.strftime("%Y-%m-%d_%H-%M-%S")
-    save_path = os.path.join(os.getcwd(), f"results/{folder_name}")
+    folder_name = f"/{model_name}_{quant}" + current_time.strftime("%Y-%m-%d_%H-%M-%S")
+    folder_starter = "/home/sohamr/projects/def-ssamet-ab/sohamr/results/alpaca-gpt4"
+    save_path = folder_starter + folder_name
     os.makedirs(save_path, exist_ok=True)
     global LOSS_FILE_PATH
     LOSS_FILE_PATH = save_path + '/all_losses.txt'

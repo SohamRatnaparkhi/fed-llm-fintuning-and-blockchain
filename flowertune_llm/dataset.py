@@ -55,9 +55,8 @@ def load_data(partition_id: int, num_partitions: int, dataset_name: str):
         )
         # partitioner.dataset = local_dataset
     client_trainset = FDS.load_partition(partition_id, "train")
-    client_trainset = client_trainset.rename_column("Answer", "response")
-    client_trainset = client_trainset.rename_column(
-        "Question", "instruction")
+    client_trainset = make_alpaca_gpt4(client_trainset)
+    # client_trainset = make_medical_qa(client_trainset)
     # client_trainset = make_dataset_drug_bank(client_trainset)
     return client_trainset
 
@@ -108,4 +107,15 @@ def make_dataset_drug_bank(client_trainset):
         client_trainset.column_names)
     client_trainset = client_trainset.remove_columns(list(columns_to_remove))
 
+    return client_trainset
+
+def make_medical_qa(client_trainset):
+    client_trainset = client_trainset.rename_column("Answer", "response")
+    client_trainset = client_trainset.rename_column(
+        "Question", "instruction")
+
+    return client_trainset
+
+def make_alpaca_gpt4(client_trainset):
+    client_trainset = client_trainset.rename_column("output", "response")
     return client_trainset

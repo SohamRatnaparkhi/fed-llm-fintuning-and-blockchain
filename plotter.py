@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 
-FOLDER = '/home/sohamr/sohamr/fed-llm-fintuning-and-blockchain/results/models--openai-community--gpt242024-10-04_08-46-48'
+FOLDER = '/home/sohamr/sohamr/fed-llm-fintuning-and-blockchain/results/llama_3_1_70b_42024-10-06_00-35-45'
 
-FILE_NAME='/gpt2-drug_bank-8_3_clients.png'
+FILE_NAME='/llama_3_1_70b_4_4_bit.png'
 
 LOSS_FILE = FOLDER + '/all_losses.txt'
 

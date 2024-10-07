@@ -4,3 +4,4 @@ results
 venv2
 models
 bitandbytes
+*.out
