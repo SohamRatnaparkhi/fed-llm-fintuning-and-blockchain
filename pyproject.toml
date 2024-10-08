@@ -33,7 +33,7 @@ clientapp = "flowertune_llm.client_app:app"
 
 [tool.flwr.app.config]
 dataset.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/datasets/databricks_dolly_15k"
-model.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/unsloth/models/mistral_16bit_nemo"
+model.name = "/home/sohamr/projects/def-ssamet-ab/sohamr/unsloth/models/llama3_2_3b_16bit"
 model.quantization = 16
 model.gradient-checkpointing = true
 model.lora.peft-lora-r = 16

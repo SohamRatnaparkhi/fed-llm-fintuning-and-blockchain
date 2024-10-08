@@ -12,7 +12,12 @@ def formatting_prompts_func(example):
     # Constructing a standard Alpaca (https://github.com/tatsu-lab/stanford_alpaca#data-release) prompt
     mssg = "Below is an instruction that describes a task. Write a response that appropriately completes the request."
     for i in range(len(example["instruction"])):
-        text = f"{mssg}\n### Instruction:\n{example['instruction'][i]}\n### Response: {example['response'][i]}"
+        res = ""
+        if i < len(example['response']):
+            res = example['response'][i]
+        else:
+            break
+        text = f"{mssg}\n### Instruction:\n{example['instruction'][i]}\n### Response: {res}"
         output_texts.append(text)
     return output_texts
 
@@ -135,11 +140,5 @@ def make_databricks(client_trainset):
     # Remove the original context column
     if "context" in client_trainset.column_names:
         client_trainset = client_trainset.remove_columns(["context"])
-    
-    # Rename 'response' column if it exists
-    if "response" in client_trainset.column_names:
-        client_trainset = client_trainset.rename_column("response", "response")
-    elif "category" in client_trainset.column_names:
-        client_trainset = client_trainset.rename_column("category", "response")
-    
+
     return client_trainset
