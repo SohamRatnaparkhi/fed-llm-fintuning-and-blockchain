@@ -55,9 +55,10 @@ def load_data(partition_id: int, num_partitions: int, dataset_name: str):
         )
         # partitioner.dataset = local_dataset
     client_trainset = FDS.load_partition(partition_id, "train")
-    client_trainset = make_alpaca_gpt4(client_trainset)
+    # client_trainset = make_alpaca_gpt4(client_trainset)
     # client_trainset = make_medical_qa(client_trainset)
     # client_trainset = make_dataset_drug_bank(client_trainset)
+    client_trainset = make_databricks(client_trainset)
     return client_trainset
 
 
@@ -118,4 +119,27 @@ def make_medical_qa(client_trainset):
 
 def make_alpaca_gpt4(client_trainset):
     client_trainset = client_trainset.rename_column("output", "response")
+    return client_trainset
+
+def make_databricks(client_trainset):
+    # Replace null values in context column with empty string
+    client_trainset = client_trainset.map(lambda x: {"context": "" if x["context"] is None else x["context"]})
+    
+    # Combine context and instruction columns
+    def combine_context_instruction(example):
+        combined = f"{example['context']} {example['instruction']}".strip()
+        return {"instruction": combined}
+    
+    client_trainset = client_trainset.map(combine_context_instruction)
+    
+    # Remove the original context column
+    if "context" in client_trainset.column_names:
+        client_trainset = client_trainset.remove_columns(["context"])
+    
+    # Rename 'response' column if it exists
+    if "response" in client_trainset.column_names:
+        client_trainset = client_trainset.rename_column("response", "response")
+    elif "category" in client_trainset.column_names:
+        client_trainset = client_trainset.rename_column("category", "response")
+    
     return client_trainset

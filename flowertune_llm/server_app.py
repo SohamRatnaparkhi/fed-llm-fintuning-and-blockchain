@@ -121,7 +121,7 @@ def server_fn(context: Context):
     if model_name != "":
         model_name = model_name.split("/")[-1]
     folder_name = f"/{model_name}_{quant}" + current_time.strftime("%Y-%m-%d_%H-%M-%S")
-    folder_starter = "/home/sohamr/projects/def-ssamet-ab/sohamr/results/alpaca-gpt4"
+    folder_starter = "/home/sohamr/projects/def-ssamet-ab/sohamr/results/drug_bank"
     save_path = folder_starter + folder_name
     os.makedirs(save_path, exist_ok=True)
     global LOSS_FILE_PATH
