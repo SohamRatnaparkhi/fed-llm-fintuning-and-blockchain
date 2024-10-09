@@ -1,40 +1,64 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Assuming your loss arrays are named 'loss_4bit' and 'loss_16bit'
-fileName1_4bit = "/home/sohamr/projects/def-ssamet-ab/sohamr/results/alpaca-gpt4/llama_2_13b_4bit_42024-10-07_11-08-56/all_losses.txt"
-fileName2_16bit = "/home/sohamr/projects/def-ssamet-ab/sohamr/results/alpaca-gpt4/llama_2_13b_16bit_42024-10-07_13-24-54/all_losses.txt"
+# File paths
+fileName1_4bit = input("Enter the path to the 4-bit model loss file: ")
+fileName2_16bit = input("Enter the path to the 16-bit model loss file: ")
 
-losses1 = open(fileName1_4bit).read().splitlines()
-losses1 = [float(loss) for loss in losses1]
+# Save path
+SAVE_PATH = input("Enter the path to save the plot: ")
 
-
-losses2 = open(fileName2_16bit).read().splitlines()
-losses2 = [float(loss) for loss in losses2]
+# Read and process loss data
 
 
-loss_4bit = np.array(losses1)  # 50 values
-loss_16bit = np.array(losses2)  # 50 values
+def read_losses(file_path):
+    with open(file_path, 'r', errors='ignore') as file:
+        return np.array([float(loss) for loss in file.read().splitlines()])
 
-# Create a figure and axis
-fig, ax = plt.subplots()
 
-# Plot the losses
-ax.plot(loss_4bit, label='4-bit model')
-ax.plot(loss_16bit, label='16-bit model')
+loss_4bit = read_losses(fileName1_4bit)
+loss_16bit = read_losses(fileName2_16bit)
 
-# Set title and labels
-ax.set_title('Model Losses')
-ax.set_xlabel('Round')
-ax.set_ylabel('Loss')
+# Calculate the lowest loss for both models
+min_loss_4bit = np.min(loss_4bit)
+min_loss_16bit = np.min(loss_16bit)
 
-# Add legend
-ax.legend()
+# Create a figure and axis with improved size
+fig, ax = plt.subplots(figsize=(12, 7))
+
+# Plot the losses with improved styles
+ax.plot(loss_4bit, color='blue', linestyle='-',
+        marker='o', label='4-bit model', markersize=5)
+ax.plot(loss_16bit, color='orange', linestyle='-',
+        marker='s', label='16-bit model', markersize=5)
+
+# Add lines for the lowest loss values
+ax.axhline(y=min_loss_4bit, color='blue',
+           linestyle='--', label='Lowest Loss 4-bit')
+ax.axhline(y=min_loss_16bit, color='orange',
+           linestyle='--', label='Lowest Loss 16-bit')
+
+# Set title and labels with increased font sizes
+ax.set_title('Comparison of Model Losses with Focused Range', fontsize=16)
+ax.set_xlabel('Training Round', fontsize=12)
+ax.set_ylabel('Loss', fontsize=12)
+
+# Customize the legend
+ax.legend(fontsize=10, loc='upper right')
+
+# Enable grid for better readability
+ax.grid(True, linestyle='--', alpha=0.7)
+
+# Set y-axis limits to focus on the range of interest
+ax.set_ylim(bottom=min(min_loss_4bit, min_loss_16bit) - 0.1,
+            top=max(max(loss_4bit), max(loss_16bit)) + 0.1)
+
+# Improve tick label size
+ax.tick_params(axis='both', which='major', labelsize=10)
+
+# Adjust layout and save the figure
+plt.tight_layout()
+plt.savefig(SAVE_PATH, dpi=300, bbox_inches='tight')
 
 # Show the plot
 plt.show()
-
-
-SAVE_PATH = "./img.png"
-
-plt.savefig(SAVE_PATH)
