@@ -3,10 +3,10 @@ import numpy as np
 
 # File paths for each model
 file_paths = {
-    "llama2-13b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/medical_qa/llama_2_13b_16bit_82024-10-06_14-27-43/all_losses.txt",
-    "llama3.2-3b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/medical_qa/llama3_2_3b_16bit_42024-10-06_13-15-14/all_losses.txt",
-    "llama3.1-8b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/medical_qa/llama_3_1_16bit_82024-10-06_18-01-54/all_losses.txt",
-    "mistral-nemo-12b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/medical_qa/mistral_16bit_nemo_82024-10-07_01-43-56/all_losses.txt"
+    "llama2-13b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/databricks_dolly_15k/llama_2_13b_4bit_42024-10-08_12-01-24/all_losses.txt",
+    "llama3.2-3b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/databricks_dolly_15k/llama3_2_3b_16bit_162024-10-08_15-12-54/all_losses.txt",
+    "llama3.1-8b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/databricks_dolly_15k/llama_3_1_16bit_162024-10-08_13-16-14/all_losses.txt",
+    "mistral-nemo-12b": "/home/sohamr/projects/federated-learning/flowertune-llm/flowertune-llm/all_losses/databricks_dolly_15k/mistral_16bit_nemo_162024-10-08_13-27-54/all_losses.txt"
 }
 
 # Save path
