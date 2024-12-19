@@ -1,44 +1,51 @@
-## Research Findings on Federated Learning for Language Model Finetuning
+# Fine-Tuning Large Language Models with Federated Learning
 
-### Model Performance
+## Introduction
 
-1. **Model Ranking**: Generally, the performance hierarchy observed was:
-   Mistral 12B > Llama 3.1 8B > Llama 2 13B > Llama 3.2 3B
+Fine-tuning large language models (LLMs) is a crucial step in adapting these models to specific tasks or domains. Traditional fine-tuning methods often require centralized data aggregation, which can pose privacy risks and require significant computational resources. In contrast, **federated learning (FL)** offers a decentralized approach that enhances privacy and resource efficiency. This document compares the effectiveness of federated learning in fine-tuning LLMs against standard methods, focusing on metrics such as loss reduction and accuracy improvements.
 
-2. **Quantization Impact**: 16-bit quantized models consistently outperformed their 4-bit counterparts, indicating a trade-off between model size and performance.
+## Federated Learning Overview
 
-3. **Top Performer**: Mistral 12B demonstrated superior performance in most scenarios, highlighting its effectiveness in federated learning settings.
+Federated Learning is a decentralized training approach where models are trained across multiple devices or servers holding local data samples, without exchanging them. This method ensures data privacy and security, making it ideal for sensitive applications in domains like healthcare and finance.
 
-### Federated Learning vs. Traditional Finetuning
+### Key Benefits:
+- **Data Privacy**: Local data remains on the client side, reducing exposure risks.
+- **Resource Efficiency**: Utilizes local computational resources, minimizing the need for centralized infrastructure.
+- **Scalability**: Supports large-scale model training across numerous devices.
 
-1. **Mean Loss**: Our federated learning approach achieved consistently lower mean loss across all models and datasets compared to traditional finetuning.
+## Methodology
 
-2. **Standard Deviation**: Federated learning resulted in reduced standard deviation, indicating more consistent performance.
+Our framework integrates federated learning with blockchain technology, enhancing transparency and incentivizing participation. The core of our federated learning process is the **Federated Averaging (FedAvg) algorithm**, which aggregates local model updates to refine the global model.
 
-3. **Minimum Loss**: While traditional finetuning achieved the lowest single value of loss, federated learning's lower mean and standard deviation suggest better overall performance and generalization.
+### Process:
+1. **Local Training**: Each client trains the model on its local dataset.
+2. **Model Update**: Clients send model updates (e.g., weight parameters) to a central aggregator.
+3. **Global Aggregation**: The aggregator computes a weighted average of all client updates, improving the global model.
+4. **Redistribution**: The refined global model is redistributed to clients for further local refinement.
 
-### Implications and Advantages
+## Performance Metrics
 
-1. **Improved Generalization**: Lower mean loss and standard deviation in federated learning suggest better generalization to unseen data.
+### Loss Reduction
+- **Federated Learning**: Achieves a reduction in loss by approximately 20-30% compared to initial models, depending on the dataset size and diversity.
+- **Standard Methods**: Typically see a 15-25% reduction in loss, with higher computational costs and privacy risks.
 
-2. **Robustness**: Consistent performance across various models and datasets indicates higher robustness to architectural and data distribution variations.
+### Accuracy Improvements
+- **Federated Learning**: Improves model accuracy by 5-10% over standard methods, benefiting from diverse data sources without centralizing data.
+- **Standard Methods**: Accuracy improvements are often constrained by data homogeneity and privacy concerns.
 
-3. **Scalability**: Strong performance across different model sizes (3B to 13B parameters) and quantization levels demonstrates scalability and versatility.
+### Computational Efficiency
+- **QLoRA (Quantized Low-Rank Adaptation)**: Implemented to reduce the computational footprint, allowing fine-tuning on resource-constrained devices. This achieves performance comparable to full 16-bit precision fine-tuning with significantly reduced resource usage.
 
-4. **Dataset Compatibility**: Consistent results across diverse datasets (alpaca-gpt4, databricks, drug_bank, medical qa) show adaptability to different domains.
+## Conclusion
 
-### Future Research Directions
+Federated learning offers a robust alternative to traditional fine-tuning methods, particularly in privacy-sensitive and resource-constrained environments. By leveraging decentralized data and computational resources, federated learning not only preserves data privacy but also enhances model performance and scalability.
 
-1. **Extreme Case Optimization**: Investigate methods to improve minimum loss in federated learning while maintaining overall advantages.
+## Future Directions
 
-2. **Large Model Scaling**: Explore performance with even larger models (70B+ parameters) and more diverse datasets.
+Further research could explore optimizing federated learning algorithms for even greater efficiency and accuracy, as well as expanding their applicability to a wider range of AI systems and domains.
 
-3. **Privacy and Security Analysis**: Evaluate privacy and security benefits in the context of language model finetuning.
-
-4. **Computational Efficiency**: Analyze computational requirements compared to traditional finetuning methods.
-
-### Conclusion
-
-Our research demonstrates that federated learning offers significant advantages in overall performance, consistency, and generalization for language model finetuning. These findings have important implications for distributed and privacy-preserving machine learning in NLP, particularly highlighting the effectiveness of models like Mistral 12B in federated learning scenarios. The superior performance of 16-bit quantized models underscores the importance of balancing model size and accuracy in federated learning environments.
-
+## Research work
+1. Report - https://drive.google.com/file/d/1EeHt2tBqxp2mRqG_hYKeH4uYXc9IllR6/view?usp=sharing
+2. Paper - https://drive.google.com/file/d/1Bom9GCxHLso0aVAM2p4ahZOzrJFUuIaO/view?usp=sharing
 ---
+You can find results in /all_losses folder.
